@@ -1,7 +1,7 @@
-/**
- * Orphan process
- * The child process is adopted by init process, when parent process dies
- **/
+/*
+  Orphan process
+  The child process is adopted by init process, when parent process dies
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,7 +27,6 @@ int main() {
     while(1) {
       sleep(1);
       printf("Child 1: My parent is: %i\n", getppid());
-
     }
   }
 
