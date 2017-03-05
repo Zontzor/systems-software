@@ -20,7 +20,6 @@ int main(void) {
   // Create a child process
   pid = fork();
   
-  
   // Setup child file descriptors
   if (pid == 0) {
     // Take no input, close fd[0]
