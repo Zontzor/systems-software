@@ -1,6 +1,10 @@
+/*
+  Using the pipe and fork commands, create a parent process that can send a 
+  message to a child.
+*/
+
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
 
