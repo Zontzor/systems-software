@@ -9,7 +9,7 @@
 
 int main(void) {
   char backup_dir[100] = "/home/alex/Coding/systems-software/change-tracker/backup/";
-  char source_dir[100] = "/home/alex/Coding/systems-software/change-tracker/var";
+  char source_dir[100] = "/home/alex/Coding/systems-software/change-tracker/website/dev";
   
   struct tm *tm;
   time_t t;
