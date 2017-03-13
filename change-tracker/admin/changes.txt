@@ -1,2 +1,0 @@
-  2373306      0 -rw-rw-r--   1 alex     alex            0 Mar 13 00:11 /home/alex/Coding/systems-software/change-tracker/website/dev/./var/www/html/login.html
-  2373280      4 -rw-rw-r--   1 alex     alex           84 Mar 12 23:50 /home/alex/Coding/systems-software/change-tracker/website/dev/./var/www/html/index.html
