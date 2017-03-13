@@ -6,10 +6,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-
-int main(void) {
+int main(int argc, char* argv[]) {
   char backup_dir[100] = "/home/alex/Coding/systems-software/change-tracker/backup/";
-  char source_dir[100] = "/home/alex/Coding/systems-software/change-tracker/website/dev";
+  char dev_dir[100] = "/home/alex/Coding/systems-software/change-tracker/website/dev";
   
   struct tm *tm;
   time_t t;
@@ -23,9 +22,8 @@ int main(void) {
   strcat(backup_dir, str_timestamp);
   
   char *command = "/bin/cp";
-  char *arguments[] = { "cp", "-a", source_dir, backup_dir, NULL };
+  char *arguments[] = { "cp", "-a", dev_dir, backup_dir, NULL };
   execvp(command, arguments);
   
   return 0;
 }
-
