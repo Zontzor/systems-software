@@ -96,7 +96,7 @@ void exec2() {
   close(pipefd2[1]);
   
   // exec
-  execlp("awk", "awk", "{print $5,$10,$11}", NULL);
+  execlp("awk", "awk",  "{print $5\",\"$10\",\"$11}", NULL);
   
   // error check
   perror("bad exec grep root");
