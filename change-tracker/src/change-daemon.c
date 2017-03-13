@@ -16,7 +16,7 @@ void main() {
   
   int fd; /*file descriptor to the file we will redirect ls's output*/
   
-  FILE *file = fopen("/home/alex/Coding/systems-software/change-tracker/admin/changes.txt", "w");
+  FILE *file = fopen("/home/alex/Coding/systems-software/change-tracker/admin/changes.csv", "w");
   
   fd = fileno(file);
   
