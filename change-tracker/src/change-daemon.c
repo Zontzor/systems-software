@@ -10,13 +10,14 @@ int pid;
 int pipefd1[2];
 int pipefd2[2];
 
-char dev_dir[100] = "/home/alex/Coding/systems-software/change-tracker/website/dev/.";
+char dev_dir[100] = "/home/alex/Coding/systems-software/change-tracker/website/dev/";
+char changes_dir[100] = "/home/alex/Coding/systems-software/change-tracker/admin/changes.txt";
 
 void main() {
   
   int fd; /*file descriptor to the file we will redirect ls's output*/
   
-  FILE *file = fopen("/home/alex/Coding/systems-software/change-tracker/admin/changes.csv", "w");
+  FILE *file = fopen(changes_dir, "w");
   
   fd = fileno(file);
   
@@ -75,7 +76,7 @@ void exec1() {
   close(pipefd1[1]);
   
   // exec
-  execlp("find", dev_dir, "-mtime", "-1", "-type", "f", "-ls",  NULL);
+  execlp("find", "find", dev_dir, "-mtime", "-1", "-type", "f", "-ls",  NULL);
   
   // exec didn't work, exit
   perror("Error with ls -al");
@@ -96,7 +97,7 @@ void exec2() {
   close(pipefd2[1]);
   
   // exec
-  execlp("awk", "awk",  "{print $5\",\"$10\",\"$11}", NULL);
+  execlp("awk", "awk", "{print $11}", NULL);
   
   // error check
   perror("bad exec grep root");
