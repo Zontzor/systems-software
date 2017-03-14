@@ -35,3 +35,5 @@
 # Directories
 bin/
 backup/
+*.txt
+*.html
