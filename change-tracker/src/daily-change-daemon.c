@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <sys/stat.h>
+#include <syslog.h>
 
 void exec1();
 void exec2();
@@ -13,8 +15,9 @@ int pipefd2[2];
 char dev_dir[100] = "/home/alex/Coding/systems-software/change-tracker/website/dev/";
 char changes_dir[100] = "/home/alex/Coding/systems-software/change-tracker/admin/changes.txt";
 
+void daemonize();
+
 void main() {
-  
   int fd; /*file descriptor to the file we will redirect ls's output*/
   
   FILE *file = fopen(changes_dir, "w");
@@ -24,7 +27,7 @@ void main() {
   dup2(fd,STDOUT_FILENO); /*copy the file descriptor fd into standard output*/
   dup2(fd,STDERR_FILENO); /* same, for the standard error */
   close(fd);
-
+  
   // create pipe between find and awk
   if (pipe(pipefd1) == -1) {
     perror("Error Init Pipe");
@@ -120,3 +123,28 @@ void exec3() {
   _exit(1);
 }
 
+void daemonize() {
+  int pid = fork();
+  int fd;
+  
+  if (pid > 0) {
+    exit(EXIT_SUCCESS);
+  } else if (pid == 0) {
+    printf("Starting child process\n");
+  
+    if (setsid() < 0) {
+      exit(EXIT_FAILURE);
+    };
+    
+    umask(0);
+
+    if (chdir("/") < 0) {
+      exit(EXIT_FAILURE);
+    };
+    
+    int x;
+    for (x = sysconf(_SC_OPEN_MAX); x >= 0; x--) {
+      close(x);
+    }
+  }
+}
