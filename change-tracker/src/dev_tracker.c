@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include "routes.h"
 #include "dev_tracker.h"
 
 void exec1();
@@ -12,12 +13,9 @@ int pid;
 int pipefd1[2];
 int pipefd2[2];
 
-char dev_dir[100] = "/home/alex/Coding/systems-software/change-tracker/website/dev/";
-char changes_dir[100] = "/home/alex/Coding/systems-software/change-tracker/admin/dev_changes.txt";
-
 void get_changes();
 
-void dev_change_tracker() {
+void dev_tracker() {
   int fd;
 
   FILE *file = fopen(changes_dir, "w");
