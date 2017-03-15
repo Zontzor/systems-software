@@ -1,6 +1,6 @@
 /*
-  Create a	C	program that can compare two	times	and	countdown	to a specific 
-  time.	
+  Create a	C	program that can compare two	times	and	countdown	to a specific
+  time.
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,6 +9,8 @@
 #include <sys/stat.h>
 
 char dev_dir[100] = "/home/alex/Coding/systems-software/change-tracker/website/dev/";
+
+void daemonize();
 
 int main() {
   // Create a child process
@@ -21,17 +23,17 @@ int main() {
     exit(EXIT_SUCCESS);
   } else if (pid == 0) {
     printf("Child process\n");
-    
+
     if (setsid() < 0) {
       exit(EXIT_FAILURE);
     };
-    
+
     umask(0);
-    
+
     if (chdir("/") < 0) {
       exit(EXIT_FAILURE);
     };
-  
+
     int x;
     for (x = sysconf(_SC_OPEN_MAX); x >= 0; x--) {
       close(x);
@@ -40,19 +42,19 @@ int main() {
     while(1) {
       time_t now = time(NULL);
       struct tm newyear;
-      
+
       newyear = *localtime(&now);
       newyear.tm_hour = 9;
       newyear.tm_min = 0;
       newyear.tm_sec = 0;
   		int time_diff_am = difftime(mktime(&newyear), now);
-      
+
       newyear = *localtime(&now);
       newyear.tm_hour = 17;
       newyear.tm_min = 0;
       newyear.tm_sec = 0;
       int time_diff_pm = difftime(mktime(&newyear), now);
-      
+
       if (time_diff_am == 0) {
         char mode[4]="0000";
         int i;
@@ -64,10 +66,30 @@ int main() {
         i = strtol(mode, 0, 8);
         chmod(dev_dir, i);
       }
-      
+
   		sleep(1);
     }
   }
 
   return 0;
+}
+
+void daemonize() {
+  int pid = fork();
+
+  if (pid > 0) {
+    exit(EXIT_SUCCESS);
+  } else if (pid == 0) {
+    printf("Starting child process\n");
+
+    if (setsid() < 0) {
+      exit(EXIT_FAILURE);
+    };
+
+    umask(0);
+
+    if (chdir("/") < 0) {
+      exit(EXIT_FAILURE);
+    };
+  }
 }
