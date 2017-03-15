@@ -1,6 +1,6 @@
 CC=gcc -g
-objects = main.o routes.o dev_tracker.o perms_changer.o backup.o
-headers = main.c routes.h dev_tracker.h perms_changer.h backup.h
+objects = main.o routes.o dev_tracker.o perms_changer.o backup.o transfer.o
+headers = main.c routes.h dev_tracker.h perms_changer.h backup.h transfer.h
 
 myprog : $(objects)
 				$(CC) -o bin/change_tracker $(objects) -lm
@@ -19,6 +19,9 @@ perms_changer.o : perms_changer.c
 				
 backup.o : backup.c
 				$(CC) -c backup.c -lm
+
+transfer.o : transfer.c
+				$(CC) -c transfer.c -lm
 
 clean:
 				rm bin/change_tracker $(objects)

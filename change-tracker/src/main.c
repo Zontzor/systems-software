@@ -6,13 +6,14 @@
 #include "dev_tracker.h"
 #include "perms_changer.h"
 #include "backup.h"
+#include "transfer.h"
 
 void daemonize();
 
 int main() {
   daemonize();
     
-  dev_tracker();
+  //dev_tracker();
   
   time_t now;
   struct tm newyear;
@@ -32,6 +33,7 @@ int main() {
     if (seconds == 0) {
       lock_dir();
       backup();
+      transfer();
       unlock_dir();
     }
     
