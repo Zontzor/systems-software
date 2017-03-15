@@ -2,19 +2,39 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <time.h>
 #include "dev_tracker.h"
+#include "perms_changer.h"
 
 void daemonize();
 
 int main() {
   daemonize();
     
-  dev_change_tracker();
-    
+  //dev_tracker();
+  
+  time_t now;
+  struct tm newyear;
+  double seconds;
+  time(&now);
+  newyear = *localtime(&now);
+  newyear.tm_hour = 21; 
+  newyear.tm_min = 48; 
+  newyear.tm_sec = 0;
+  
   int i = 0;
   while(i < 30) {
-    // TODO: Queue logic
+    // TODO: Queue/backup logic
+    
+    time(&now);
+    seconds = difftime(now, mktime(&newyear));
+    if (seconds == 0) {
+      lock_dir();
+      unlock_dir();
+    }
+    
     i++;
+    sleep(1);
   }
 
   return 0;
