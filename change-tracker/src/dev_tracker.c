@@ -8,6 +8,10 @@ void exec1();
 void exec2();
 void exec3();
 
+int pid;
+int pipefd1[2];
+int pipefd2[2];
+
 char dev_dir[100] = "/home/alex/Coding/systems-software/change-tracker/website/dev/";
 char changes_dir[100] = "/home/alex/Coding/systems-software/change-tracker/admin/dev_changes.txt";
 
@@ -23,7 +27,7 @@ void dev_change_tracker() {
   dup2(fd,STDOUT_FILENO);
   dup2(fd,STDERR_FILENO);
   close(fd);
-  
+
   while(1) {
     get_changes();
     sleep(1);
@@ -31,10 +35,6 @@ void dev_change_tracker() {
 }
 
 void get_changes() {
-  int pid;
-  int pipefd1[2];
-  int pipefd2[2];
-
   char foo[4096];
 
   // create pipe between find and awk
