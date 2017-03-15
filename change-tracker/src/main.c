@@ -5,31 +5,33 @@
 #include <time.h>
 #include "dev_tracker.h"
 #include "perms_changer.h"
+#include "backup.h"
 
 void daemonize();
 
 int main() {
   daemonize();
     
-  //dev_tracker();
+  dev_tracker();
   
   time_t now;
   struct tm newyear;
   double seconds;
   time(&now);
   newyear = *localtime(&now);
-  newyear.tm_hour = 21; 
-  newyear.tm_min = 48; 
+  newyear.tm_hour = 0; 
+  newyear.tm_min = 0; 
   newyear.tm_sec = 0;
   
   int i = 0;
-  while(i < 30) {
+  while(i < 60) {
     // TODO: Queue/backup logic
     
     time(&now);
     seconds = difftime(now, mktime(&newyear));
     if (seconds == 0) {
       lock_dir();
+      backup();
       unlock_dir();
     }
     

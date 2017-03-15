@@ -6,7 +6,7 @@
 #include "perms_changer.h"
 
 void lock_dir() {
-  char mode[4] = "0000";
+  char mode[4] = "0555";
   int i = strtol(mode, 0, 8);
   chmod(dev_dir, i);
 }

@@ -5,10 +5,6 @@
 #include "routes.h"
 #include "dev_tracker.h"
 
-void exec1();
-void exec2();
-void exec3();
-
 int pid;
 int pipefd1[2];
 int pipefd2[2];
