@@ -3,7 +3,7 @@ objects = main.o dev_tracker.o
 headers = main.c dev_tracker.h
 
 myprog : $(objects)
-				$(CC) -o change_tracker $(objects) -lm
+				$(CC) -o bin/change_tracker $(objects) -lm
 
 main.o : main.c $(headers)
 				$(CC) -c main.c

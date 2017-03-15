@@ -118,5 +118,6 @@ void get_changes() {
     close(pipefd2[1]);
     int nbytes = read(pipefd2[0], foo, sizeof(foo));
     printf("%.*s", nbytes, foo);
+    close(pipefd2[0]);
   }
 }
