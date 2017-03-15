@@ -15,35 +15,32 @@ void daemonize();
 void get_changes();
 
 void main() {
+  daemonize();
   int i = 0;
-  
   while(i < 5) {
-    daemonize();
+    get_changes();
     sleep(5);
     i++;
-  }  
+  }
 }
 
 void daemonize() {
   int pid = fork();
-  int fd;
-  
+
   if (pid > 0) {
     exit(EXIT_SUCCESS);
   } else if (pid == 0) {
     printf("Starting child process\n");
-  
+
     if (setsid() < 0) {
       exit(EXIT_FAILURE);
     };
-    
+
     umask(0);
 
     if (chdir("/") < 0) {
       exit(EXIT_FAILURE);
     };
-    
-    get_changes();
   }
 }
 
@@ -51,17 +48,19 @@ void get_changes() {
   int pid;
   int pipefd1[2];
   int pipefd2[2];
-  
-  int fd; 
-  
+
+  char foo[4096];
+
+  int fd;
+
   FILE *file = fopen(changes_dir, "w");
-  
+
   fd = fileno(file);
-  
-  dup2(fd,STDOUT_FILENO); 
+
+  dup2(fd,STDOUT_FILENO);
   dup2(fd,STDERR_FILENO);
   close(fd);
-  
+
   // create pipe between find and awk
   if (pipe(pipefd1) == -1) {
     perror("Error Init Pipe");
@@ -74,14 +73,14 @@ void get_changes() {
     exit(1);
   } else if (pid == 0) {
     dup2(pipefd1[1], 1);
-    
+
     // close fds
     close(pipefd1[0]);
     close(pipefd1[1]);
-    
+
     // exec
     execlp("find", "find", dev_dir, "-mtime", "-1", "-type", "f", "-ls",  NULL);
-    
+
     // exec didn't work, exit
     perror("Error with ls -al");
     _exit(1);
@@ -100,19 +99,19 @@ void get_changes() {
   } else if (pid == 0) {
     // get the input from pipe 1
     dup2(pipefd1[0], 0);
-    
+
     // set the output to pipe 2
     dup2(pipefd2[1], 1);
-    
+
     // close fds
     close(pipefd1[0]);
     close(pipefd1[1]);
     close(pipefd2[0]);
     close(pipefd2[1]);
-    
+
     // exec
     execlp("awk", "awk", "{print $11}", NULL);
-    
+
     // error check
     perror("bad exec grep root");
     _exit(1);
@@ -129,15 +128,19 @@ void get_changes() {
   } else if (pid == 0) {
     // get the input from pipe 2
     dup2(pipefd2[0], 0);
-    
+
     // close fds
     close(pipefd2[0]);
     close(pipefd2[1]);
     // exec
     execlp("sort", "sort", "-u", NULL);
-    
+
     // error Check
     perror("Error with sort");
     _exit(1);
+  } else {
+    close(pipefd2[1]);
+    int nbytes = read(pipefd2[0], foo, sizeof(foo));
+    printf("%.*s", nbytes, foo);
   }
 }
