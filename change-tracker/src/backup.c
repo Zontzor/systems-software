@@ -1,3 +1,10 @@
+/*
+  Authour: Alex Kiernan
+  Date: 14/03/17
+  
+  Desc: Module responsible for backing up live dir. Names backup dir as 
+        timestamp.
+**/
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -11,8 +18,8 @@ void backup() {
   time_t t;
   char str_timestamp[100];
   
-  char local_dev_dir[100];
-  strcpy(local_dev_dir, dev_dir);
+  char local_live_dir[100];
+  strcpy(local_live_dir, live_dir);
   
   char local_backup_dir[100];
   strcpy(local_backup_dir, backup_dir);
@@ -34,7 +41,7 @@ void backup() {
     exit(1);
   } else if (pid == 0) {
     char *command = "/bin/cp";
-    char *arguments[] = { "cp", "-a", local_dev_dir, local_backup_dir, NULL };
+    char *arguments[] = { "cp", "-a", local_live_dir, local_backup_dir, NULL };
     execvp(command, arguments);
 
     // exec didn't work, exit

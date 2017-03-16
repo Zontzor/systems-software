@@ -94,11 +94,11 @@ void get_transfers() {
     // exec find
     execlp("find", "find", dev_html_dir, "-mtime", "-1", "-type", "f", NULL);
 
-    // exec didn't work, exit
     perror("Error with ls -al");
     _exit(1);
   } else {
     close(pipefd[1]);
+    // Read exec output and print to stdout (redirects to file)
     int nbytes = read(pipefd[0], data, sizeof(data));
     printf("%.*s", nbytes, data);
     close(pipefd[0]);

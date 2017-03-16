@@ -1,3 +1,9 @@
+/*
+  Authour: Alex Kiernan
+  Date: 14/03/17
+  
+  Desc: Module to lock and unlock dev dir.
+**/
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

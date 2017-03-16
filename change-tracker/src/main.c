@@ -1,3 +1,13 @@
+/*
+  Authour: Alex Kiernan
+  Date: 14/03/17
+  
+  Desc: Manager for website change tracker. 
+    
+    1. Create daemon
+    2. Start dev dir change tracker
+    3. Every second, check if correct time to execute backup/transfer
+**/
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -21,12 +31,12 @@ int main() {
   time(&now);
   newyear = *localtime(&now);
   newyear.tm_hour = 22; 
-  newyear.tm_min = 10; 
+  newyear.tm_min = 26; 
   newyear.tm_sec = 0;
   
   int i = 0;
   while(i < 60) {
-    // TODO: Queue/backup logic
+    // TODO: Queue logic
     
     time(&now);
     seconds = difftime(now, mktime(&newyear));

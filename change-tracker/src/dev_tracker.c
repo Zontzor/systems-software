@@ -1,3 +1,13 @@
+/*
+  Authour: Alex Kiernan
+  Date: 14/03/17
+  
+  Desc: Module to continuously monitor the dev dir.
+    
+    1. Redirect stdout to text file
+    2. Once every second, execute find on dev dir and filter by user, date and
+       filename  
+**/
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -31,13 +41,13 @@ void dev_tracker() {
 void get_changes() {
   char data[4096];
 
-  // create pipe between find and awk
+  // Create pipe between find and awk
   if (pipe(pipefd1) == -1) {
     perror("Error Init Pipe");
     exit(1);
   }
 
-  // fork (ls aux)
+  // fork (find)
   if ((pid = fork()) == -1) {
     perror("Error find fork");
     exit(1);
@@ -48,15 +58,15 @@ void get_changes() {
     close(pipefd1[0]);
     close(pipefd1[1]);
 
-    // exec
+    // exec (find)
     execlp("find", "find", dev_dir, "-cmin", "-0.017", "-type", "f", "-ls",  NULL);
-
-    // exec didn't work, exit
+    
+    // error check
     perror("Error with ls -al");
     _exit(1);
   }
 
-  // create pipe between awk and sort
+  // Create pipe between awk and sort
   if (pipe(pipefd2) == -1) {
     perror("Error Init Pipe");
     exit(1);
@@ -79,7 +89,7 @@ void get_changes() {
     close(pipefd2[0]);
     close(pipefd2[1]);
 
-    // exec
+    // exec (awk), specifying user, date and filepath
     execlp("awk", "awk", "{print $5,$8,$9,$10,$11}", NULL);
 
     // error check
@@ -105,7 +115,7 @@ void get_changes() {
     // exec
     execlp("sort", "sort", "-u", NULL);
 
-    // error Check
+    // error check
     perror("Error with sort");
     _exit(1);
   } else {
