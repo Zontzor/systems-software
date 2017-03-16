@@ -29,7 +29,7 @@ void dev_tracker() {
 }
 
 void get_changes() {
-  char foo[4096];
+  char data[4096];
 
   // create pipe between find and awk
   if (pipe(pipefd1) == -1) {
@@ -110,8 +110,8 @@ void get_changes() {
     _exit(1);
   } else {
     close(pipefd2[1]);
-    int nbytes = read(pipefd2[0], foo, sizeof(foo));
-    printf("%.*s", nbytes, foo);
+    int nbytes = read(pipefd2[0], data, sizeof(data));
+    printf("%.*s", nbytes, data);
     close(pipefd2[0]);
   }
 }
