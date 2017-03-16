@@ -11,28 +11,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/stat.h>
+#include <string.h>
 #include <time.h>
+#include <mqueue.h>
+#include "daemonize.h"
 #include "dev_tracker.h"
 #include "perms_changer.h"
 #include "backup.h"
 #include "transfer.h"
 
-void daemonize();
-
 int main() {
   daemonize();
-    
-  //dev_tracker();
   
   time_t now;
   struct tm newyear;
   double seconds;
   time(&now);
   newyear = *localtime(&now);
-  newyear.tm_hour = 22; 
-  newyear.tm_min = 26; 
+  newyear.tm_hour = 23; 
+  newyear.tm_min = 35; 
   newyear.tm_sec = 0;
+  
+  //dev_tracker();
   
   int i = 0;
   while(i < 60) {
@@ -54,22 +54,4 @@ int main() {
   return 0;
 }
 
-void daemonize() {
-  int pid = fork();
 
-  if (pid > 0) {
-    exit(EXIT_SUCCESS);
-  } else if (pid == 0) {
-    printf("Starting child process\n");
-
-    if (setsid() < 0) {
-      exit(EXIT_FAILURE);
-    };
-
-    umask(0);
-
-    if (chdir("/") < 0) {
-      exit(EXIT_FAILURE);
-    };
-  }
-}
