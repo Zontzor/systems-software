@@ -35,7 +35,7 @@ void backup() {
   
   pid_t pid;
   
-  // fork (ls aux)
+  // fork (cp)
   if ((pid = fork()) == -1) {
     perror("Error cp fork");
     exit(1);
@@ -44,7 +44,7 @@ void backup() {
     char *arguments[] = { "cp", "-a", local_live_dir, local_backup_dir, NULL };
     execvp(command, arguments);
 
-    // exec didn't work, exit
+    // error check
     perror("Error with cp");
     _exit(1);
   }
