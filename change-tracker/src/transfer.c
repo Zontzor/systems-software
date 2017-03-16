@@ -1,3 +1,14 @@
+/*
+  Authour: Alex Kiernan
+  Date: 16/03/17
+  
+  Desc: Module to find changed files for the previous 24 hours.
+    
+    1. Find the changed files using unix 'find'
+    2. Redirect 'find' output data to file
+    3. Open newly update file and store contents in array
+    4. Loop through array and copy each file to the live dir
+**/
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -10,7 +21,10 @@ void get_transfers();
 
 void transfer() {
   get_transfers();
+  // Sleep to allow above function to finish
+  sleep(5);
   
+  // Create local versions of file path constants to nullify warning
   char local_transfers_dir[100];
   strcpy(local_transfers_dir, transfers_dir);
   
@@ -30,6 +44,7 @@ void transfer() {
   
   char records[10][100];
   
+  // Store contents of file in array
   while(fscanf(fp, "%s", records[i]) != EOF) {
     i++;
   }
@@ -38,6 +53,7 @@ void transfer() {
   
   num_lines = i;
   
+  // Loop through each element of the array and copy file to live dir
   for (int i = 0; i < num_lines; i++) {
     pid_t pid = fork();
     if (pid == 0) {
@@ -50,20 +66,20 @@ void transfer() {
   }
 }
 
+// Get the changed files using unix 'find' and store them to a file
 void get_transfers() {
   int pid;
   int pipefd[2];
-
-  char foo[4096];
-
   int fd;
+  char data[4096];
 
   FILE *file = fopen(transfers_dir, "w");
-
+  
+  // Get file descriptor for pointer
   fd = fileno(file);
-
+  
+  // Redirect stdout to file in order to print exec find data
   dup2(fd,STDOUT_FILENO);
-  dup2(fd,STDERR_FILENO);
   close(fd);
   
   pipe(pipefd);
@@ -73,16 +89,18 @@ void get_transfers() {
     perror("Error find fork");
     exit(1);
   } else if (pid == 0) {
+    close(pipefd[0]);
     close(pipefd[1]);
-    // exec
+    // exec find
     execlp("find", "find", dev_html_dir, "-mtime", "-1", "-type", "f", NULL);
 
     // exec didn't work, exit
     perror("Error with ls -al");
     _exit(1);
   } else {
-    int nbytes = read(pipefd[0], foo, sizeof(foo));
-    printf("%.*s", nbytes, foo);
+    close(pipefd[1]);
+    int nbytes = read(pipefd[0], data, sizeof(data));
+    printf("%.*s", nbytes, data);
     close(pipefd[0]);
   }
 }

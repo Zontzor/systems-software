@@ -20,8 +20,8 @@ int main() {
   double seconds;
   time(&now);
   newyear = *localtime(&now);
-  newyear.tm_hour = 21; 
-  newyear.tm_min = 39; 
+  newyear.tm_hour = 22; 
+  newyear.tm_min = 10; 
   newyear.tm_sec = 0;
   
   int i = 0;
@@ -32,7 +32,7 @@ int main() {
     seconds = difftime(now, mktime(&newyear));
     if (seconds == 0) {
       lock_dir();
-      //backup();
+      backup();
       transfer();
       unlock_dir();
     }
