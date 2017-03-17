@@ -28,8 +28,8 @@ int main() {
   double seconds;
   time(&now);
   newyear = *localtime(&now);
-  newyear.tm_hour = 23; 
-  newyear.tm_min = 35; 
+  newyear.tm_hour = 0; 
+  newyear.tm_min = 14; 
   newyear.tm_sec = 0;
   
   //dev_tracker();
@@ -45,6 +45,8 @@ int main() {
       backup();
       transfer();
       unlock_dir();
+    } else {
+      dev_tracker();
     }
     
     i++;

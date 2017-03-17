@@ -23,19 +23,21 @@ void get_changes();
 
 void dev_tracker() {
   int fd;
+  
+  int saved_stdout = dup(STDOUT_FILENO);
 
-  FILE *file = fopen(changes_dir, "w");
+  FILE *file = fopen(changes_dir, "a");
 
   fd = fileno(file);
 
   dup2(fd,STDOUT_FILENO);
-  dup2(fd,STDERR_FILENO);
   close(fd);
 
-  while(1) {
-    get_changes();
-    sleep(1);
-  }
+  get_changes();
+  
+  fflush(stdout);
+  dup2(saved_stdout, STDOUT_FILENO);
+  close(saved_stdout);
 }
 
 void get_changes() {
