@@ -1,15 +1,12 @@
 CC=gcc -g
-objects = main.o routes.o daemonize.o dev_tracker.o perms_changer.o backup.o transfer.o
-headers = main.c routes.h daemonize.h dev_tracker.h perms_changer.h backup.h transfer.h
+objects = main.o routes.o dev_tracker.o perms_changer.o backup.o transfer.o queue.o
+headers = main.c routes.h dev_tracker.h perms_changer.h backup.h transfer.h queue.h
 
 myprog : $(objects)
 				$(CC) -o bin/change_tracker $(objects) -lm -lrt
 
 main.o : main.c $(headers)
 				$(CC) -c main.c -lrt
-				
-daemonize.o : daemonize.c
-				$(CC) -c daemonize.c -lm
 								
 routes.o : routes.c
 				$(CC) -c routes.c -lm
@@ -25,6 +22,9 @@ backup.o : backup.c
 
 transfer.o : transfer.c
 				$(CC) -c transfer.c -lm
+				
+queue.o : queue.c
+				$(CC) -c queue.c -lm
 
 clean:
 				rm bin/change_tracker $(objects)
