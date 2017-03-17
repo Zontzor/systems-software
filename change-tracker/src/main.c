@@ -21,8 +21,13 @@
 #include "backup.h"
 #include "transfer.h"
 
+#define QUEUE_NAME "/ct_queue"
+
+int queue();
+
 int main() {
   daemonize();
+  //queue();
   
   // Create target time struct
   time_t now;
@@ -31,30 +36,12 @@ int main() {
   time(&now);
   
   newyear = *localtime(&now);
-  newyear.tm_hour = 0; 
-  newyear.tm_min = 21; 
+  newyear.tm_hour = 11; 
+  newyear.tm_min = 59; 
   newyear.tm_sec = 0;
-  
-  // Create queue
-  mqd_t mq;
-  struct mq_attr queue_attributes;
-  char buffer[1024 + 1];
-  int terminate = 0;
-
-  queue_attributes.mq_flags = 0;
-  queue_attributes.mq_maxmsg = 10;
-  queue_attributes.mq_msgsize = 1024;
-  queue_attributes.mq_curmsgs = 0;
-
-  mq = mq_open("/ct_queue", O_CREAT | O_RDONLY, 0644, &queue_attributes); 
-  openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
-  syslog(LOG_INFO, "Created message queue");
-  closelog();
   
   int i = 0;
   while(i < 60) {
-    // TODO: Queue logic
-    
     time(&now);
     seconds = difftime(now, mktime(&newyear));
     if (seconds == 0) {
@@ -69,11 +56,41 @@ int main() {
     i++;
     sleep(1);
   }
-  
-  mq_close(mq);
-  mq_unlink("/ct_queue");
 
   return 0;
 }
 
+int queue() {
+  daemonize();
+  
+  mqd_t mq;
+  struct mq_attr queue_attributes;
+  char buffer[1024 + 1];
+  int terminate = 0;
 
+  queue_attributes.mq_flags = 1;
+  queue_attributes.mq_maxmsg = 10;
+  queue_attributes.mq_msgsize = 1024;
+  queue_attributes.mq_curmsgs = 0;
+
+  mq = mq_open("/ct_queue", O_CREAT | O_RDONLY, 0644, &queue_attributes); 
+
+  do {
+    ssize_t bytes_read;
+    
+    bytes_read = mq_receive(mq, buffer, 1024, NULL);
+    
+    buffer[bytes_read] = '\0';
+    if (!strncmp(buffer, "exit", strlen("exit")))
+    {terminate = 1;}
+    else 
+    {printf("Recieved: %s\n", buffer);}
+    
+    sleep(1);
+  } while(!terminate);
+
+  mq_close(mq);
+  mq_unlink(QUEUE_NAME);
+  
+  return 0;
+}

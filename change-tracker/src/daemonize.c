@@ -21,5 +21,10 @@ void daemonize() {
     if (chdir("/") < 0) {
       exit(EXIT_FAILURE);
     };
+    
+    int x;
+    for (x = sysconf(_SC_OPEN_MAX); x >= 0; x--) {
+      close(x);
+    }
   }
 }
