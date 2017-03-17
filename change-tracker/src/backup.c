@@ -7,9 +7,10 @@
 **/
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <unistd.h>
+#include <syslog.h>
 #include <string.h>
+#include <time.h>
 #include "routes.h"
 #include  <sys/types.h>
 
