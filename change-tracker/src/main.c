@@ -5,8 +5,8 @@
   Desc: Manager for website change tracker. 
     
     1. Create daemon
-    2. Start dev dir change tracker
-    3. Every second, check if correct time to execute backup/transfer
+    2. Every second, check if correct time to execute backup/transfer, else
+       check for changes to dev
 **/
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,16 +23,29 @@
 int main() {
   daemonize();
   
+  // Create target time struct
   time_t now;
   struct tm newyear;
   double seconds;
   time(&now);
+  
   newyear = *localtime(&now);
   newyear.tm_hour = 0; 
-  newyear.tm_min = 14; 
+  newyear.tm_min = 21; 
   newyear.tm_sec = 0;
   
-  //dev_tracker();
+  // Create queue
+  mqd_t mq;
+  struct mq_attr queue_attributes;
+  char buffer[1024 + 1];
+  int terminate = 0;
+
+  queue_attributes.mq_flags = 0;
+  queue_attributes.mq_maxmsg = 10;
+  queue_attributes.mq_msgsize = 1024;
+  queue_attributes.mq_curmsgs = 0;
+
+  mq = mq_open("/ct_queue", O_CREAT | O_RDONLY, 0644, &queue_attributes); 
   
   int i = 0;
   while(i < 60) {
@@ -47,11 +60,15 @@ int main() {
       unlock_dir();
     } else {
       dev_tracker();
+      
     }
     
     i++;
     sleep(1);
   }
+  
+  mq_close(mq);
+  mq_unlink("/ct_queue");
 
   return 0;
 }
