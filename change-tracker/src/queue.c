@@ -9,12 +9,11 @@
 
 #define QUEUE_NAME "/ct_queue"
 
-void queue() {
+int queue() {
   int pid = fork();
 
   if (pid > 0) { // Allow parent to run
   } else if (pid == 0) {
-    printf("Starting queue process\n");
 
     if (setsid() < 0) {
       exit(EXIT_FAILURE);
@@ -44,10 +43,10 @@ void queue() {
     mq = mq_open(QUEUE_NAME, O_CREAT | O_RDONLY, 0644, &queue_attributes);
     
     openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
-    syslog(LOG_INFO, "Queue started");
+    syslog(LOG_INFO, "Started queue process");
     closelog(); 
-
-    do {
+    
+    while(1); {
       ssize_t bytes_read;
       
       bytes_read = mq_receive(mq, buffer, 1024, NULL);
@@ -57,17 +56,17 @@ void queue() {
         terminate = 1;
       }
       else {
-        printf("Recieved: %s\n", buffer);
-        
         openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
         syslog(LOG_INFO, "Recieved: %s\n", buffer);
         closelog(); 
       }
-      
       sleep(1);
-    } while(!terminate);
+    } 
+    
 
     mq_close(mq);
     mq_unlink(QUEUE_NAME);
   }
+  
+  return 0;
 }

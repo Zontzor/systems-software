@@ -52,6 +52,10 @@ void get_changes() {
 
   // fork (find)
   if ((pid = fork()) == -1) {
+    openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
+    syslog(LOG_INFO, "dev_tracker: Error find fork");
+    closelog();
+    
     perror("Error find fork");
     exit(1);
   } else if (pid == 0) {
@@ -77,6 +81,10 @@ void get_changes() {
 
   // fork (awk)
   if ((pid = fork()) == -1) {
+    openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
+    syslog(LOG_INFO, "dev_tracker: Error awk fork");
+    closelog();
+    
     perror("Error awk fork");
     exit(1);
   } else if (pid == 0) {
@@ -106,6 +114,10 @@ void get_changes() {
 
   // fork (sort)
   if ((pid = fork()) == -1) {
+    openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
+    syslog(LOG_INFO, "dev_tracker: Error sort fork");
+    closelog();
+    
     perror("Error sort fork");
     exit(1);
   } else if (pid == 0) {
