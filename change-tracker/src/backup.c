@@ -35,9 +35,16 @@ void backup() {
   
   pid_t pid;
   
+  openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
+  syslog(LOG_INFO, "Starting backup");
+  closelog();
+  
   // fork (cp)
   if ((pid = fork()) == -1) {
     perror("Error cp fork");
+    openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
+    syslog(LOG_INFO, "Backup error");
+    closelog();
     exit(1);
   } else if (pid == 0) {
     char *command = "/bin/cp";

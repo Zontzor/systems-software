@@ -14,6 +14,7 @@
 #include <string.h>
 #include <time.h>
 #include <mqueue.h>
+#include <syslog.h>
 #include "daemonize.h"
 #include "dev_tracker.h"
 #include "perms_changer.h"
@@ -46,6 +47,9 @@ int main() {
   queue_attributes.mq_curmsgs = 0;
 
   mq = mq_open("/ct_queue", O_CREAT | O_RDONLY, 0644, &queue_attributes); 
+  openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
+  syslog(LOG_INFO, "Created message queue");
+  closelog();
   
   int i = 0;
   while(i < 60) {
@@ -60,8 +64,7 @@ int main() {
       unlock_dir();
     } else {
       dev_tracker();
-      
-    }
+    } 
     
     i++;
     sleep(1);
