@@ -7,7 +7,7 @@
     1. Create daemon
     2. Every second, check if correct time to execute backup/transfer, else
        check for changes to dev
-    3. Register signals to accept user 
+    3. Register signals to accept user invocation
 **/
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,14 +54,14 @@ int main() {
   
     // Create target time struct
     time_t now;
-    struct tm newyear;
+    struct tm midnight;
     double seconds;
     time(&now);
     
-    newyear = *localtime(&now);
-    newyear.tm_hour = 16; 
-    newyear.tm_min = 55; 
-    newyear.tm_sec = 0;
+    midnight = *localtime(&now);
+    midnight.tm_hour = 0; 
+    midnight.tm_min = 0; 
+    midnight.tm_sec = 0;
     
     // Register SIGINT to kernel
     if (signal(SIGINT, signal_handler) == SIG_ERR) {
@@ -80,7 +80,7 @@ int main() {
     int i = 0;
     while(1) {
       time(&now);
-      seconds = difftime(now, mktime(&newyear));
+      seconds = difftime(now, mktime(&midnight));
       if (seconds == 0) {      
         lock_dir();
         backup();
