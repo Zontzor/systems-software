@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <syslog.h>
 #include <string.h>
+#include <mqueue.h>
 #include <time.h>
 #include "routes.h"
 #include <sys/types.h>
@@ -60,10 +61,24 @@ void backup() {
     int status;
     pid = wait(&status);
     if (WIFEXITED(status)) {
+      // Connect to queue as client
+      mqd_t mq;
+      char buffer[1024];
+      mq = mq_open(QUEUE_NAME, O_WRONLY);
+      mq_send(mq, "backup_success", 1024, 0);
+      mq_close(mq);
+      
+      
       openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
       syslog(LOG_INFO, "Backup success");
       closelog();
     } else {
+      mqd_t mq;
+      char buffer[1024];
+      mq = mq_open(QUEUE_NAME, O_WRONLY);
+      mq_send(mq, "backup_failure", 1024, 0);
+      mq_close(mq);
+      
       openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
       syslog(LOG_INFO, "Backup failure");
       closelog();

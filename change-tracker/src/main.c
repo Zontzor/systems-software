@@ -50,7 +50,7 @@ int main() {
       close(x);
     }
   
-    //queue();
+    queue();
   
     // Create target time struct
     time_t now;

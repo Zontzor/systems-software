@@ -46,7 +46,7 @@ int queue() {
     syslog(LOG_INFO, "Started queue process");
     closelog(); 
     
-    while(1); {
+    while(1) {
       ssize_t bytes_read;
       
       bytes_read = mq_receive(mq, buffer, 1024, NULL);
