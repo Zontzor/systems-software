@@ -77,7 +77,6 @@ int main() {
       closelog();
     }
     
-    int i = 0;
     while(1) {
       time(&now);
       seconds = difftime(now, mktime(&midnight));
@@ -89,8 +88,6 @@ int main() {
       } else {
         dev_tracker();
       } 
-      
-      i++;
       sleep(1);
     }
   }

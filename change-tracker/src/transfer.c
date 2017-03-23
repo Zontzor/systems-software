@@ -15,9 +15,12 @@
 #include <unistd.h>
 #include <string.h>
 #include <syslog.h>
+#include <mqueue.h>
 #include "routes.h"
 #include <sys/types.h>
 #include <sys/wait.h>
+
+#define QUEUE_NAME "/ct_queue"
 
 void get_transfers();
 
@@ -109,10 +112,22 @@ void get_transfers() {
     close(pipefd[0]);
     
     if (WIFEXITED(status)) {
+      mqd_t mq;
+      char buffer[1024];
+      mq = mq_open(QUEUE_NAME, O_WRONLY);
+      mq_send(mq, "transfer_success", 1024, 0);
+      mq_close(mq);
+      
       openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
       syslog(LOG_INFO, "Transfer success");
       closelog();
     } else {
+      mqd_t mq;
+      char buffer[1024];
+      mq = mq_open(QUEUE_NAME, O_WRONLY);
+      mq_send(mq, "transfer_failure", 1024, 0);
+      mq_close(mq);
+      
       openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
       syslog(LOG_INFO, "Transfer failure");
       closelog();
