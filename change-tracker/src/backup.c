@@ -11,9 +11,9 @@
 #include <syslog.h>
 #include <string.h>
 #include <time.h>
-#include <mqueue.h>
 #include "routes.h"
-#include  <sys/types.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #define QUEUE_NAME "/ct_queue"
 
@@ -31,10 +31,6 @@ void backup() {
   t = time(NULL);
   tm = localtime(&t);
   
-  mqd_t mq;
-  char buffer[1024];
-  mq = mq_open(QUEUE_NAME, O_WRONLY);
-  
   // Get a string timestamp
   strftime(str_timestamp, sizeof(str_timestamp), "%Y%m%d%H%M%S", tm);
   
@@ -43,14 +39,8 @@ void backup() {
   
   pid_t pid;
   
-  openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
-  syslog(LOG_INFO, "Starting backup");
-  closelog();
-  
   // fork (cp)
   if ((pid = fork()) == -1) {
-    mq_send(mq, "Failure", 1024, 0);
-    
     perror("Error cp fork");
     
     openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
@@ -59,8 +49,6 @@ void backup() {
     
     exit(1);
   } else if (pid == 0) {
-    mq_send(mq, "Success", 1024, 0);
-    
     char *command = "/bin/cp";
     char *arguments[] = { "cp", "-a", local_live_dir, local_backup_dir, NULL };
     execvp(command, arguments);
@@ -68,5 +56,17 @@ void backup() {
     // error check
     perror("Error with cp");
     _exit(1);
+  } else {
+    int status;
+    pid = wait(&status);
+    if (WIFEXITED(status)) {
+      openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
+      syslog(LOG_INFO, "Backup Success");
+      closelog();
+    } else {
+      openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
+      syslog(LOG_INFO, "Backup Failure");
+      closelog();
+    }
   }
 }

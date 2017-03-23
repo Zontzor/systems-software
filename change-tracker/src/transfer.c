@@ -14,8 +14,10 @@
 #include <time.h>
 #include <unistd.h>
 #include <string.h>
+#include <syslog.h>
 #include "routes.h"
 #include <sys/types.h>
+#include <sys/wait.h>
 
 void get_transfers();
 
@@ -97,10 +99,23 @@ void get_transfers() {
     perror("Error with ls -al");
     _exit(1);
   } else {
+    int status;
+    pid = wait(&status);
+    
     close(pipefd[1]);
     // Read exec output and print to stdout (redirects to file)
     int nbytes = read(pipefd[0], data, sizeof(data));
     printf("%.*s", nbytes, data);
     close(pipefd[0]);
+    
+    if (WIFEXITED(status)) {
+      openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
+      syslog(LOG_INFO, "Transfer Success");
+      closelog();
+    } else {
+      openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
+      syslog(LOG_INFO, "Transfer Failure");
+      closelog();
+    }
   }
 }
