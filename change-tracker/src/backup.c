@@ -61,11 +61,11 @@ void backup() {
     pid = wait(&status);
     if (WIFEXITED(status)) {
       openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
-      syslog(LOG_INFO, "Backup Success");
+      syslog(LOG_INFO, "Backup success");
       closelog();
     } else {
       openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
-      syslog(LOG_INFO, "Backup Failure");
+      syslog(LOG_INFO, "Backup failure");
       closelog();
     }
   }

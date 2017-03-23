@@ -110,11 +110,11 @@ void get_transfers() {
     
     if (WIFEXITED(status)) {
       openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
-      syslog(LOG_INFO, "Transfer Success");
+      syslog(LOG_INFO, "Transfer success");
       closelog();
     } else {
       openlog("change_tracker", LOG_PID|LOG_CONS, LOG_USER);
-      syslog(LOG_INFO, "Transfer Failure");
+      syslog(LOG_INFO, "Transfer failure");
       closelog();
     }
   }
