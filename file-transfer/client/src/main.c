@@ -10,12 +10,13 @@
  
 #define MSG_SIZE 100 
 #define PATH_SIZE 500 
+#define FILE_SIZE 512
 #define LOCAL_STORAGE "/home/alex/Coding/systems-software/file-transfer/client/storage/"
  
 int main(int argc, char *argv[]) {
   int sock;
   struct sockaddr_in server;
-  char option[2], message[MSG_SIZE], server_reply[MSG_SIZE], file_dir[PATH_SIZE];
+  char option[2], response[10], message[MSG_SIZE], server_reply[MSG_SIZE], file_dir[PATH_SIZE];
    
   // Create socket
   sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -62,8 +63,6 @@ int main(int argc, char *argv[]) {
       }
       send(sock, message, strlen(message), 0); 
       
-      
-      
       // Send path
       puts("\nChoose a path: ");
       puts("1. Root");
@@ -89,6 +88,32 @@ int main(int argc, char *argv[]) {
         return 1;
       }
       
+      char file_buffer[FILE_SIZE]; 
+      memset(file_buffer, 0, sizeof(file_buffer));
+	    int block_size, i = 0; 
+	    printf("\nSending %s to server... ", file_dir);
+	    FILE *file_open = fopen(file_dir, "r");
+	          
+	    while((block_size = fread(file_buffer, sizeof(char), FILE_SIZE, file_open)) > 0) {
+    		printf("Data sent %d = %d\n", i, block_size);
+    		if (send(sock, file_buffer, block_size, 0) < 0) {
+            return 1;
+        }  
+    		memset(file_buffer, 0, sizeof(file_buffer));
+    		i++;
+      }
+      
+      recv(sock, response, 10, 0);
+      
+      if (strcmp(response, "OK") == 0) {
+        puts("Transfer successful");
+      } else {
+        puts("Transfer unsuccessful");
+        close(sock);
+        return 1;
+      }
+      
+      fclose(file_open);
     } else if (strcmp(option, "99") == 0) {
       close(sock);
       return 0;
