@@ -9,18 +9,19 @@
 #include <arpa/inet.h>
  
 #define MSG_SIZE 100 
+#define PATH_SIZE 500 
+#define LOCAL_STORAGE "/home/alex/Coding/systems-software/file-transfer/client/storage/"
  
 int main(int argc, char *argv[]) {
   int sock;
   struct sockaddr_in server;
-  char option[2], message[MSG_SIZE], server_reply[MSG_SIZE];
+  char option[2], message[MSG_SIZE], server_reply[MSG_SIZE], file_dir[PATH_SIZE];
    
   // Create socket
   sock = socket(AF_INET, SOCK_STREAM, 0);
   if (sock == -1) {
     puts("Could not create socket");
   }
-  //puts("Socket created");
    
   server.sin_addr.s_addr = inet_addr("127.0.0.1");
   server.sin_family = AF_INET;
@@ -50,9 +51,18 @@ int main(int argc, char *argv[]) {
       
       // Send filename
       puts("\nEnter a filename: ");
-      printf("\n> ");
+      printf("> ");
       scanf("%s", message);
+      
+      strcpy(file_dir, LOCAL_STORAGE);
+      strcat(file_dir, message);
+      if(access(file_dir, F_OK) == -1 ) {
+        puts("File doesn't exist");
+        return 1;
+      }
       send(sock, message, strlen(message), 0); 
+      
+      
       
       // Send path
       puts("\nChoose a path: ");
@@ -61,22 +71,22 @@ int main(int argc, char *argv[]) {
       puts("3. Promotions");
       puts("4. Offers");
       puts("5. Marketing");
-      printf("\n> ");
+      printf("> ");
       scanf("%s", option);
       
       if (strcmp(option, "1") == 0) {
         send(sock, "/", strlen("/"), 0); 
       } else if (strcmp(option, "2") == 0) {
-        send(sock, "/sales", strlen("/sales"), 0);
+        send(sock, "sales", strlen("sales"), 0);
       } else if (strcmp(option, "3") == 0) {
-        send(sock, "/promotions", strlen("/promotions"), 0);
+        send(sock, "promotions", strlen("promotions"), 0);
       } else if (strcmp(option, "4") == 0) {
-        send(sock, "/offers", strlen("/offers"), 0);
+        send(sock, "offers", strlen("offers"), 0);
       } else if (strcmp(option, "5") == 0) {
-        send(sock, "/marketing", strlen("/marketing"), 0);
+        send(sock, "marketing", strlen("marketing"), 0);
       } else {
         puts("Not an option");
-        return 0;
+        return 1;
       }
       
     } else if (strcmp(option, "99") == 0) {

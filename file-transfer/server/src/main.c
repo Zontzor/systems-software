@@ -10,6 +10,8 @@
 #include <pthread.h>
 
 #define MSG_SIZE 100 
+#define PATH_SIZE 500 
+#define WEBSITE_DIR "/home/alex/Coding/systems-software/file-transfer/server/website"
  
 void *connection_handler(void *);
  
@@ -76,7 +78,7 @@ void *connection_handler(void *socket_desc) {
   int sock = *(int*)socket_desc;
   int read_size;
   char *message, client_message[MSG_SIZE], client_filename[MSG_SIZE], 
-  client_filepath[MSG_SIZE];
+  client_filepath[MSG_SIZE], full_filepath[PATH_SIZE];
   
   // Receive message from client
   while((read_size = recv(sock, client_message, MSG_SIZE, 0)) > 0) {
@@ -87,11 +89,16 @@ void *connection_handler(void *socket_desc) {
       
       // Recieve filename
       recv(sock, client_filename, MSG_SIZE, 0); 
-      printf("\nfilename: %s", client_filename);
       
       // Recieve path
       recv(sock, client_filepath, MSG_SIZE, 0); 
-      printf("\nfilepath: %s", client_filepath);
+      
+      strcpy(full_filepath, WEBSITE_DIR);
+      strcat(full_filepath, "/");
+      strcat(full_filepath, client_filepath);
+      strcat(full_filepath, "/");
+      strcat(full_filepath, client_filename);
+      puts(full_filepath);
     }
 
     // Cleanup message memeory
