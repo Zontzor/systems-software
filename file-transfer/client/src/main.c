@@ -16,7 +16,7 @@
 int main(int argc, char *argv[]) {
   int sock;
   struct sockaddr_in server;
-  char option[2], response[10], message[MSG_SIZE], server_reply[MSG_SIZE], file_dir[PATH_SIZE];
+  char option[2], response[10], message[MSG_SIZE], server_reply[MSG_SIZE], file_dir[PATH_SIZE], username[50], password[50];
    
   // Create socket
   sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -34,7 +34,26 @@ int main(int argc, char *argv[]) {
     return 1;
   }
    
-  puts("Connected\n");
+  puts("Connected to server\n");
+  
+  send(sock, "INIT_LOGIN", strlen("INIT_LOGIN"), 0);  
+  
+  printf("Username: ");
+  scanf("%s", username);
+  send(sock, username, strlen(username), 0);
+  
+  printf("Password: ");
+  scanf("%s", password);
+  send(sock, password, strlen(password), 0);  
+  
+  recv(sock, response, 10, 0);
+  
+  if (strcmp(response, "200") == 0) {
+    puts("\nLogin successful\n");
+  } else {
+    puts("\nLogin unsuccessful\n");
+    return 1;
+  }
    
   // Keep communicating with server
   while(1) {

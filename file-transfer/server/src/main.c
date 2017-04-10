@@ -13,6 +13,7 @@
 #define PATH_SIZE 500 
 #define FILE_SIZE 512
 #define WEBSITE_DIR "/home/alex/Coding/systems-software/file-transfer/server/website"
+#define AUTH_DIR "/home/alex/Coding/systems-software/file-transfer/server/storage/auth.txt"
 
 pthread_mutex_t lock_x;
  
@@ -81,14 +82,53 @@ void *connection_handler(void *socket_desc) {
   int sock = *(int*)socket_desc;
   int read_size;
   char *message, client_message[MSG_SIZE], client_filename[MSG_SIZE], 
-  client_filepath[MSG_SIZE], server_filepath[PATH_SIZE], file_buffer[FILE_SIZE];
+  client_filepath[MSG_SIZE], server_filepath[PATH_SIZE], file_buffer[FILE_SIZE],
+  username[50], password[50];
   
   // Receive message from client
   while((read_size = recv(sock, client_message, MSG_SIZE, 0)) > 0) {
     
+    // Open auth file and check client credentials
+    if (strcmp(client_message, "INIT_LOGIN") == 0) {
+      puts("\nLogin started");
+      int found = 0;
+      char user_auth[50], pass_auth[50];
+      
+      recv(sock, username, 50, 0);
+      recv(sock, password, 50, 0);
+      
+      pthread_mutex_lock(&lock_x);
+      
+      FILE *auth_file = fopen(AUTH_DIR, "r");
+      
+      char line[80];
+      
+      while(fgets(line, 80, auth_file)) {
+        sscanf(line, "username: %s password: %s", user_auth, pass_auth);
+        
+        if((strcmp(username, user_auth) == 0) && (strcmp(password, pass_auth) == 0)) {
+          found = 1;
+        }
+      }
+      
+      fclose(auth_file);
+      pthread_mutex_unlock(&lock_x);
+      
+      if (found == 1) {
+        send(sock, "200", sizeof("200"), 0);
+      } else {
+        send(sock, "401", sizeof("401"), 0);
+        puts("Login aborted");
+        free(socket_desc);
+        pthread_exit(NULL);
+      }
+
+      puts("Login completed\n");
+    }
+    
     // Read client message
     if (strcmp(client_message, "INIT_TRANSFER") == 0) {
-      puts("\nTransfer started");
+      puts("Transfer started");
       
       // Recieve filename
       recv(sock, client_filename, MSG_SIZE, 0); 
@@ -124,7 +164,7 @@ void *connection_handler(void *socket_desc) {
         }
       }
       
-      puts("Transfer completed");
+      puts("Transfer completed\n");
       send(sock, "OK", sizeof("OK"), 0);   
       fclose(file_open); 
       

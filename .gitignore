@@ -1,3 +1,5 @@
+!file-transfer/server/storage/auth.txt
+
 # Object files
 *.o
 *.ko
