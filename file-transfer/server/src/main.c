@@ -1,13 +1,15 @@
 /*
   Multi-threaded socket server
 **/
-#include<stdio.h>
-#include<string.h>    
-#include<stdlib.h>
-#include<sys/socket.h>
-#include<arpa/inet.h>
-#include<unistd.h>
-#include<pthread.h>
+#include <stdio.h>
+#include <string.h>    
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <pthread.h>
+
+#define MSG_SIZE 100 
  
 void *connection_handler(void *);
  
@@ -18,7 +20,7 @@ int main(int argc , char *argv[]) {
   // Create socket
   socket_desc = socket(AF_INET, SOCK_STREAM, 0);
   if (socket_desc == -1) {
-    printf("Could not create socket");
+    puts("Could not create socket");
   }
   puts("Socket created");
    
@@ -73,12 +75,26 @@ void *connection_handler(void *socket_desc) {
   // Get the socket descriptor
   int sock = *(int*)socket_desc;
   int read_size;
-  char *message, client_message[2000];
+  char *message, client_message[MSG_SIZE], client_filename[MSG_SIZE], 
+  client_filepath[MSG_SIZE];
   
   // Receive message from client
-  while((read_size = recv(sock, client_message, 2000, 0)) > 0) {
-    // Send message back to client
-    write(sock, client_message, strlen(client_message) + 1);
+  while((read_size = recv(sock, client_message, MSG_SIZE, 0)) > 0) {
+    
+    // Read client message
+    if (strcmp(client_message, "INIT_TRANSFER") == 0) {
+      puts("\nStarting transfer");
+      
+      // Recieve filename
+      recv(sock, client_filename, MSG_SIZE, 0); 
+      printf("\nfilename: %s", client_filename);
+      
+      // Recieve path
+      recv(sock, client_filepath, MSG_SIZE, 0); 
+      printf("\nfilepath: %s", client_filepath);
+    }
+
+    // Cleanup message memeory
     memset(client_message, 0, sizeof(client_message));
   }
    

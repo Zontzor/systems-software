@@ -6,7 +6,7 @@ myprog : $(objects)
 				$(CC) -o bin/file_transfer_client $(objects)
 
 main.o : main.c $(headers)
-				$(CC) -c main.c -lrt
+				$(CC) -c main.c
 
 clean:
 				rm bin/file_transfer_client $(objects)
