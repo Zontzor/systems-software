@@ -106,9 +106,9 @@ int main(int argc, char *argv[]) {
       recv(sock, response, 10, 0);
       
       if (strcmp(response, "OK") == 0) {
-        puts("Transfer successful");
+        puts("Transfer successful\n");
       } else {
-        puts("Transfer unsuccessful");
+        puts("Transfer unsuccessful\n");
         close(sock);
         return 1;
       }

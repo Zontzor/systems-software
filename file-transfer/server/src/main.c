@@ -13,6 +13,8 @@
 #define PATH_SIZE 500 
 #define FILE_SIZE 512
 #define WEBSITE_DIR "/home/alex/Coding/systems-software/file-transfer/server/website"
+
+pthread_mutex_t lock_x;
  
 void *connection_handler(void *);
  
@@ -102,6 +104,9 @@ void *connection_handler(void *socket_desc) {
       strcat(server_filepath, client_filename);
       puts(server_filepath);
       
+      // Lock shared resource
+      pthread_mutex_lock(&lock_x);
+      
       // Recieve file
       FILE *file_open = fopen(server_filepath, "w");
       
@@ -122,6 +127,9 @@ void *connection_handler(void *socket_desc) {
       puts("Transfer completed");
       send(sock, "OK", sizeof("OK"), 0);   
       fclose(file_open); 
+      
+      // Unlock shared resource
+      pthread_mutex_unlock(&lock_x);
     }
   }
    
@@ -135,6 +143,6 @@ void *connection_handler(void *socket_desc) {
        
   // Free socket pointer
   free(socket_desc);
-   
-  return 0;
+  
+  pthread_exit(NULL);
 }
