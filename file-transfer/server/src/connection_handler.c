@@ -5,6 +5,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <syslog.h>
+#include <time.h>
 
 #define MSG_SIZE 100
 #define PATH_SIZE 500
@@ -111,6 +113,13 @@ void *connection_handler(void *socket_desc) {
             break;
         }
       }
+      
+      time_t rawtime;
+      struct tm * timeinfo;
+      time ( &rawtime );
+      timeinfo = localtime ( &rawtime );
+      openlog("file_changer", LOG_PID|LOG_CONS, LOG_USER);
+      syslog(LOG_INFO, "User: %s modified %s at %s", username, client_filename, asctime (timeinfo));
 
       puts("Transfer completed\n");
       send(sock, "OK", sizeof("OK"), 0);
